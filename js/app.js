@@ -20,10 +20,10 @@ class WineTripPlanner {
                 id: 'experience',
                 question: 'How would you describe your wine experience?',
                 options: [
-                    { value: 'beginner', text: '🌱 New to wine - excited to learn!', description: 'Perfect for accessible tastings and educational experiences' },
-                    { value: 'intermediate', text: '🍷 I know what I like and want to explore more', description: 'Ready for diverse tastings and some premium experiences' },
-                    { value: 'expert', text: '🎯 Experienced - looking for unique discoveries', description: 'Seeking rare varietals and boutique wineries' },
-                    { value: 'professional', text: '👑 Wine professional or serious collector', description: 'Access to exclusive tastings and limited releases' }
+                    { value: 'beginner', text: 'New to wine - excited to learn!', description: 'Perfect for accessible tastings and educational experiences' },
+                    { value: 'intermediate', text: 'I know what I like and want to explore more', description: 'Ready for diverse tastings and some premium experiences' },
+                    { value: 'expert', text: 'Experienced - looking for unique discoveries', description: 'Seeking rare varietals and boutique wineries' },
+                    { value: 'professional', text: 'Wine professional or serious collector', description: 'Access to exclusive tastings and limited releases' }
                 ]
             },
             {
@@ -31,31 +31,31 @@ class WineTripPlanner {
                 question: 'Which wine styles excite you most?',
                 multiple: true,
                 options: [
-                    { value: 'reds', text: '❤️ Bold reds (Cabernet, Syrah, Merlot)', description: 'Full-bodied wines with rich flavors' },
-                    { value: 'whites', text: '💛 Crisp whites (Riesling, Chardonnay, Sauvignon Blanc)', description: 'Fresh, aromatic, and food-friendly wines' },
-                    { value: 'sparkling', text: '✨ Sparkling wines and Champagne-style', description: 'Bubbles for celebrations and special moments' },
-                    { value: 'dessert', text: '🍯 Sweet and dessert wines', description: 'Perfect endings to meals or standalone treats' },
-                    { value: 'natural', text: '🌿 Natural and biodynamic wines', description: 'Minimal intervention, terroir-focused wines' }
+                    { value: 'reds', text: 'Bold reds (Cabernet, Syrah, Merlot)', description: 'Full-bodied wines with rich flavors' },
+                    { value: 'whites', text: 'Crisp whites (Riesling, Chardonnay, Sauvignon Blanc)', description: 'Fresh, aromatic, and food-friendly wines' },
+                    { value: 'sparkling', text: 'Sparkling wines and Champagne-style', description: 'Bubbles for celebrations and special moments' },
+                    { value: 'dessert', text: 'Sweet and dessert wines', description: 'Perfect endings to meals or standalone treats' },
+                    { value: 'natural', text: 'Natural and biodynamic wines', description: 'Minimal intervention, terroir-focused wines' }
                 ]
             },
             {
                 id: 'duration',
                 question: 'How long is your wine adventure?',
                 options: [
-                    { value: 'day', text: '☀️ Perfect day trip (1 day)', description: '3-4 tastings with lunch' },
-                    { value: 'weekend', text: '🌙 Weekend getaway (2-3 days)', description: '6-8 wineries with dining and accommodation' },
-                    { value: 'week', text: '🏖️ Extended vacation (4-7 days)', description: 'Comprehensive tour of multiple regions' },
-                    { value: 'flexible', text: '🎭 I\'m flexible with timing', description: 'We\'ll suggest the ideal duration' }
+                    { value: 'day', text: 'Perfect day trip (1 day)', description: '3-4 tastings with lunch' },
+                    { value: 'weekend', text: 'Weekend getaway (2-3 days)', description: '6-8 wineries with dining and accommodation' },
+                    { value: 'week', text: 'Extended vacation (4-7 days)', description: 'Comprehensive tour of multiple regions' },
+                    { value: 'flexible', text: 'I\'m flexible with timing', description: 'We\'ll suggest the ideal duration' }
                 ]
             },
             {
                 id: 'travelStyle',
                 question: 'What\'s your preferred travel style?',
                 options: [
-                    { value: 'luxury', text: '👑 Luxury experience with premium accommodations', description: 'Five-star service and exclusive experiences' },
-                    { value: 'boutique', text: '🏨 Boutique hotels and intimate experiences', description: 'Charming, unique properties with personal touch' },
-                    { value: 'adventure', text: '🚗 Road trip adventure with scenic stops', description: 'Exploring hidden gems and scenic routes' },
-                    { value: 'budget', text: '💰 Great value while staying comfortable', description: 'Quality experiences without breaking the bank' }
+                    { value: 'luxury', text: 'Luxury experience with premium accommodations', description: 'Five-star service and exclusive experiences' },
+                    { value: 'boutique', text: 'Boutique hotels and intimate experiences', description: 'Charming, unique properties with personal touch' },
+                    { value: 'adventure', text: 'Road trip adventure with scenic stops', description: 'Exploring hidden gems and scenic routes' },
+                    { value: 'budget', text: 'Great value while staying comfortable', description: 'Quality experiences without breaking the bank' }
                 ]
             },
             {
@@ -408,7 +408,6 @@ class WineTripPlanner {
                             <button class="favorite-btn ${isFavorited ? 'favorited' : ''}" 
                                     onclick="app.toggleFavorite('${winery.name}')"
                                     title="${isFavorited ? 'Remove from favorites' : 'Add to favorites'}">
-                                ❤️
                             </button>
                         </div>
                         <div class="winery-details">
