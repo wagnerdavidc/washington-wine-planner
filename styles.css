@@ -286,6 +286,30 @@ body {
     z-index: 1;
 }
 
+.custom-marker {
+    border: none !important;
+    background: transparent !important;
+}
+
+.map-popup {
+    font-family: 'Playfair Display', serif;
+    line-height: 1.5;
+    min-width: 200px;
+}
+
+.map-popup strong {
+    font-weight: 600;
+}
+
+.map-popup a {
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.map-popup a:hover {
+    text-decoration: underline;
+}
+
 /* Itinerary Summary */
 .itinerary-summary {
     background: linear-gradient(135deg, var(--info-color), #20c997);

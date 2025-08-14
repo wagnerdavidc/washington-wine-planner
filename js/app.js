@@ -535,30 +535,117 @@ class WineTripPlanner {
             attribution: '© OpenStreetMap contributors'
         }).addTo(this.map);
         
+        // Create custom icons
+        const wineryIcon = L.divIcon({
+            html: '<div style="background: #8B0000; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">🍷</div>',
+            className: 'custom-marker',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+
+        const restaurantIcon = L.divIcon({
+            html: '<div style="background: #ff6b6b; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">🍽️</div>',
+            className: 'custom-marker',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+
+        const hotelIcon = L.divIcon({
+            html: '<div style="background: #4ecdc4; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">🏨</div>',
+            className: 'custom-marker',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+        
         // Clear existing markers
-        this.wineryMarkers = [];
+        this.allMarkers = [];
         
         // Add markers for each winery
         wineries.forEach((winery, index) => {
-            const marker = L.marker(winery.coords)
+            const marker = L.marker(winery.coords, { icon: wineryIcon })
                 .addTo(this.map)
                 .bindPopup(`
                     <div class="map-popup">
-                        <strong>${winery.name}</strong><br>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <span style="font-size: 20px;">🍷</span>
+                            <strong style="color: #8B0000;">${winery.name}</strong>
+                        </div>
                         <em>${winery.region}</em><br>
                         <strong>Specialty:</strong> ${winery.specialty}<br>
                         <strong>Rating:</strong> ⭐ ${winery.rating}/5<br>
                         <strong>Tasting Fee:</strong> $${winery.tastingFee}<br>
-                        <a href="${winery.website}" target="_blank">Visit Website</a>
+                        <a href="${winery.website}" target="_blank" style="color: #8B0000;">Visit Website</a>
                     </div>
                 `);
             
-            this.wineryMarkers.push(marker);
+            this.allMarkers.push(marker);
+        });
+
+        // Add restaurant markers
+        const { restaurants, accommodations } = window.wineData;
+        const matchedRestaurants = restaurants.filter(restaurant => {
+            if (this.answers.travelStyle === 'luxury') {
+                return restaurant.priceLevel === 'luxury';
+            } else if (this.answers.travelStyle === 'budget') {
+                return restaurant.priceLevel === 'budget';
+            }
+            return true;
+        });
+
+        matchedRestaurants.forEach(restaurant => {
+            const marker = L.marker(restaurant.coords, { icon: restaurantIcon })
+                .addTo(this.map)
+                .bindPopup(`
+                    <div class="map-popup">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <span style="font-size: 20px;">🍽️</span>
+                            <strong style="color: #ff6b6b;">${restaurant.name}</strong>
+                        </div>
+                        <em>${restaurant.location}</em><br>
+                        <strong>Cuisine:</strong> ${restaurant.cuisine}<br>
+                        <strong>Rating:</strong> ⭐ ${restaurant.rating}/5<br>
+                        <strong>Price Level:</strong> ${restaurant.priceLevel}<br>
+                        <strong>Phone:</strong> ${restaurant.phone}
+                    </div>
+                `);
+            
+            this.allMarkers.push(marker);
+        });
+
+        // Add accommodation markers
+        const matchedAccommodations = accommodations.filter(accommodation => {
+            if (this.answers.travelStyle === 'luxury') {
+                return accommodation.priceLevel === 'luxury';
+            } else if (this.answers.travelStyle === 'boutique') {
+                return accommodation.priceLevel === 'boutique';
+            } else if (this.answers.travelStyle === 'budget') {
+                return accommodation.priceLevel === 'budget';
+            }
+            return true;
+        });
+
+        matchedAccommodations.forEach(accommodation => {
+            const marker = L.marker(accommodation.coords, { icon: hotelIcon })
+                .addTo(this.map)
+                .bindPopup(`
+                    <div class="map-popup">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <span style="font-size: 20px;">🏨</span>
+                            <strong style="color: #4ecdc4;">${accommodation.name}</strong>
+                        </div>
+                        <em>${accommodation.location}</em><br>
+                        <strong>Type:</strong> ${accommodation.type}<br>
+                        <strong>Rating:</strong> ⭐ ${accommodation.rating}/5<br>
+                        <strong>Price Level:</strong> ${accommodation.priceLevel}
+                    </div>
+                `);
+            
+            this.allMarkers.push(marker);
         });
         
         // Adjust map bounds to show all markers
-        if (wineries.length > 0) {
-            const group = new L.featureGroup(this.wineryMarkers);
+        if (this.allMarkers.length > 0) {
+            const group = new L.featureGroup(this.allMarkers);
             this.map.fitBounds(group.getBounds().pad(0.1));
         }
     }
