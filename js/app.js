@@ -42,8 +42,8 @@ class WineTripPlanner {
                 id: 'duration',
                 question: 'How long is your wine adventure?',
                 options: [
-                    { value: 'day', text: 'Perfect day trip (1 day)', description: '3-4 tastings with lunch' },
-                    { value: 'weekend', text: 'Weekend getaway (2-3 days)', description: '6-8 wineries with dining and accommodation' },
+                    { value: 'day', text: 'Perfect day trip (1 day)', description: '2 tastings with lunch' },
+                    { value: 'weekend', text: 'Weekend getaway (2-3 days)', description: '4-6 wineries with dining and accommodation' },
                     { value: 'week', text: 'Extended vacation (4-7 days)', description: 'Comprehensive tour of multiple regions' },
                     { value: 'flexible', text: 'I\'m flexible with timing', description: 'We\'ll suggest the ideal duration' }
                 ]
@@ -256,10 +256,10 @@ class WineTripPlanner {
 
     createItinerary(wineries) {
         const durationMap = {
-            'day': { days: 1, wineriesPerDay: 4 },
-            'weekend': { days: 2, wineriesPerDay: 4 },
-            'week': { days: 5, wineriesPerDay: 3 },
-            'flexible': { days: 3, wineriesPerDay: 3 }
+            'day': { days: 1, wineriesPerDay: 2 },
+            'weekend': { days: 2, wineriesPerDay: 2 },
+            'week': { days: 5, wineriesPerDay: 2 },
+            'flexible': { days: 3, wineriesPerDay: 2 }
         };
         
         const config = durationMap[this.answers.duration] || durationMap.flexible;
@@ -401,15 +401,23 @@ class WineTripPlanner {
             
             day.wineries.forEach((winery, index) => {
                 const isFavorited = this.userProfile.favorites.includes(winery.name);
+                const timeSlots = ['10:30 AM', '2:30 PM'];
+                const currentTime = timeSlots[index] || `${index + 1}:00 PM`;
+                
                 html += `
-                    <div class="winery-card" data-winery-id="${winery.id}">
-                        <div class="winery-header">
-                            <span class="winery-name">${winery.name}</span>
-                            <button class="favorite-btn ${isFavorited ? 'favorited' : ''}" 
-                                    onclick="app.toggleFavorite('${winery.name}')"
-                                    title="${isFavorited ? 'Remove from favorites' : 'Add to favorites'}">
-                            </button>
+                    <div class="winery-card chronological-item" data-winery-id="${winery.id}">
+                        <div class="timeline-marker">
+                            <div class="time-badge">${currentTime}</div>
+                            <div class="timeline-dot"></div>
                         </div>
+                        <div class="winery-content">
+                            <div class="winery-header">
+                                <span class="winery-name">${index + 1}. ${winery.name}</span>
+                                <button class="favorite-btn ${isFavorited ? 'favorited' : ''}" 
+                                        onclick="app.toggleFavorite('${winery.name}')"
+                                        title="${isFavorited ? 'Remove from favorites' : 'Add to favorites'}">
+                                </button>
+                            </div>
                         <div class="winery-details">
                             <div class="winery-detail">
                                 <span class="icon">📍</span>
@@ -440,9 +448,10 @@ class WineTripPlanner {
                         <div class="winery-features">
                             ${winery.features.map(feature => `<span class="feature-tag">${feature}</span>`).join('')}
                         </div>
-                        <textarea class="wine-notes" 
-                                 placeholder="Add your tasting notes for ${winery.name}..."
-                                 onchange="app.saveTastingNote('${winery.name}', this.value)">${this.userProfile.tastingNotes[winery.name] || ''}</textarea>
+                            <textarea class="wine-notes" 
+                                     placeholder="Add your tasting notes for ${winery.name}..."
+                                     onchange="app.saveTastingNote('${winery.name}', this.value)">${this.userProfile.tastingNotes[winery.name] || ''}</textarea>
+                        </div>
                     </div>
                 `;
             });
