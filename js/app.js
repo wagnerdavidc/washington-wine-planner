@@ -438,10 +438,17 @@ class WineTripPlanner {
                         <div class="winery-content">
                             <div class="winery-header">
                                 <span class="winery-name">${index + 1}. ${winery.name}</span>
-                                <button class="favorite-btn ${isFavorited ? 'favorited' : ''}" 
-                                        onclick="app.toggleFavorite('${winery.name}')"
-                                        title="${isFavorited ? 'Remove from favorites' : 'Add to favorites'}">
-                                </button>
+                                <div class="winery-actions">
+                                    <button class="favorite-btn ${isFavorited ? 'favorited' : ''}" 
+                                            onclick="app.toggleFavorite('${winery.name}')"
+                                            title="${isFavorited ? 'Remove from favorites' : 'Add to favorites'}">
+                                    </button>
+                                    <button class="replace-btn" 
+                                            onclick="app.showWineryReplacements(${day.day}, ${index}, ${winery.id})"
+                                            title="Replace this winery">
+                                        🔄 Replace
+                                    </button>
+                                </div>
                             </div>
                         <div class="winery-details">
                             <div class="winery-detail">
@@ -1016,6 +1023,164 @@ class WineTripPlanner {
            toast.classList.remove('show');
            setTimeout(() => toast.remove(), 300);
        }, 3000);
+   }
+
+   showWineryReplacements(dayIndex, wineryIndex, currentWineryId) {
+       const { wineries } = window.wineData;
+       const currentWinery = wineries.find(w => w.id === currentWineryId);
+       
+       // Get alternative wineries (exclude current one and ones already in itinerary)
+       const usedWineryIds = this.currentItinerary.flatMap(day => day.wineries.map(w => w.id));
+       const alternatives = this.filterWineries()
+           .filter(w => w.id !== currentWineryId && !usedWineryIds.includes(w.id))
+           .slice(0, 6); // Show top 6 alternatives
+
+       const modal = document.createElement('div');
+       modal.className = 'replacement-modal';
+       modal.innerHTML = `
+           <div class="replacement-content">
+               <div class="replacement-header">
+                   <h3>Replace Winery - Day ${dayIndex}</h3>
+                   <button class="close-btn" onclick="this.closest('.replacement-modal').remove()">×</button>
+               </div>
+               <div class="replacement-body">
+                   <div class="comparison-section">
+                       <div class="current-winery">
+                           <div class="winery-comparison-header">📍 Current Selection</div>
+                           <div class="comparison-grid">
+                               <div class="comparison-item">
+                                   <strong>Name:</strong>
+                                   <span>${currentWinery.name}</span>
+                               </div>
+                               <div class="comparison-item">
+                                   <strong>Region:</strong>
+                                   <span>${currentWinery.region}</span>
+                               </div>
+                               <div class="comparison-item">
+                                   <strong>Specialty:</strong>
+                                   <span>${currentWinery.specialty}</span>
+                               </div>
+                               <div class="comparison-item">
+                                   <strong>Rating:</strong>
+                                   <span>⭐ ${currentWinery.rating}/5</span>
+                               </div>
+                               <div class="comparison-item">
+                                   <strong>Tasting Fee:</strong>
+                                   <span>$${currentWinery.tastingFee}</span>
+                               </div>
+                               <div class="comparison-item">
+                                   <strong>Price Level:</strong>
+                                   <span>${currentWinery.priceLevel}</span>
+                               </div>
+                           </div>
+                       </div>
+                       <div class="replacement-winery" id="selected-replacement">
+                           <div class="winery-comparison-header">🔄 Select Replacement</div>
+                           <div class="comparison-grid">
+                               <div style="text-align: center; color: #666; font-style: italic; padding: 40px 0;">
+                                   Click on a winery below to compare
+                               </div>
+                           </div>
+                       </div>
+                   </div>
+                   <div class="alternatives-section">
+                       <h4>Alternative Wineries</h4>
+                       <div class="alternatives-grid">
+                           ${alternatives.map(winery => `
+                               <div class="alternative-card" onclick="app.selectReplacement(${winery.id}, ${dayIndex}, ${wineryIndex})">
+                                   <h4>${winery.name}</h4>
+                                   <div class="alternative-details">
+                                       <div><strong>Region:</strong> ${winery.region}</div>
+                                       <div><strong>Rating:</strong> ⭐ ${winery.rating}/5</div>
+                                       <div><strong>Fee:</strong> $${winery.tastingFee}</div>
+                                       <div><strong>Level:</strong> ${winery.priceLevel}</div>
+                                   </div>
+                                   <p style="font-size: 0.9em; color: #666; margin: 10px 0;">${winery.description.substring(0, 100)}...</p>
+                                   <div class="alternative-actions">
+                                       <button class="select-btn">Select This Winery</button>
+                                   </div>
+                               </div>
+                           `).join('')}
+                       </div>
+                   </div>
+               </div>
+           </div>
+       `;
+
+       document.body.appendChild(modal);
+   }
+
+   selectReplacement(wineryId, dayIndex, wineryIndex) {
+       const { wineries } = window.wineData;
+       const selectedWinery = wineries.find(w => w.id === wineryId);
+       
+       // Update comparison panel
+       const comparisonPanel = document.getElementById('selected-replacement');
+       if (comparisonPanel) {
+           comparisonPanel.innerHTML = `
+               <div class="winery-comparison-header">✨ Selected Replacement</div>
+               <div class="comparison-grid">
+                   <div class="comparison-item">
+                       <strong>Name:</strong>
+                       <span>${selectedWinery.name}</span>
+                   </div>
+                   <div class="comparison-item">
+                       <strong>Region:</strong>
+                       <span>${selectedWinery.region}</span>
+                   </div>
+                   <div class="comparison-item">
+                       <strong>Specialty:</strong>
+                       <span>${selectedWinery.specialty}</span>
+                   </div>
+                   <div class="comparison-item">
+                       <strong>Rating:</strong>
+                       <span>⭐ ${selectedWinery.rating}/5</span>
+                   </div>
+                   <div class="comparison-item">
+                       <strong>Tasting Fee:</strong>
+                       <span>$${selectedWinery.tastingFee}</span>
+                   </div>
+                   <div class="comparison-item">
+                       <strong>Price Level:</strong>
+                       <span>${selectedWinery.priceLevel}</span>
+                   </div>
+               </div>
+               <div style="text-align: center; margin-top: 15px;">
+                   <button class="btn btn-primary" onclick="app.confirmReplacement(${wineryId}, ${dayIndex}, ${wineryIndex})">
+                       Confirm Replacement
+                   </button>
+               </div>
+           `;
+       }
+
+       // Highlight selected card
+       document.querySelectorAll('.alternative-card').forEach(card => {
+           card.style.borderColor = 'var(--border-color)';
+           card.style.background = 'white';
+       });
+       event.currentTarget.style.borderColor = 'var(--info-color)';
+       event.currentTarget.style.background = '#f0f8ff';
+   }
+
+   confirmReplacement(newWineryId, dayIndex, wineryIndex) {
+       const { wineries } = window.wineData;
+       const newWinery = wineries.find(w => w.id === newWineryId);
+       const oldWinery = this.currentItinerary[dayIndex - 1].wineries[wineryIndex];
+       
+       // Replace the winery in the itinerary
+       this.currentItinerary[dayIndex - 1].wineries[wineryIndex] = newWinery;
+       
+       // Close modal
+       document.querySelector('.replacement-modal').remove();
+       
+       // Refresh the itinerary display
+       this.displayItinerary(this.currentItinerary);
+       
+       // Update map with new wineries
+       const allWineries = this.currentItinerary.flatMap(day => day.wineries);
+       this.initializeMap(allWineries);
+       
+       this.showToast(`Replaced ${oldWinery.name} with ${newWinery.name}! 🔄`);
    }
 }
 
