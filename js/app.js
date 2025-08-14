@@ -331,6 +331,31 @@ class WineTripPlanner {
         return baseTime + (wineries.length - 1) * timePerWinery;
     }
 
+    calculateDrivingTimeBetween(winery1, winery2) {
+        // Calculate distance using Haversine formula
+        const R = 3959; // Earth's radius in miles
+        const lat1 = winery1.coords[0] * Math.PI / 180;
+        const lat2 = winery2.coords[0] * Math.PI / 180;
+        const deltaLat = (winery2.coords[0] - winery1.coords[0]) * Math.PI / 180;
+        const deltaLng = (winery2.coords[1] - winery1.coords[1]) * Math.PI / 180;
+
+        const a = Math.sin(deltaLat/2) * Math.sin(deltaLat/2) +
+                Math.cos(lat1) * Math.cos(lat2) *
+                Math.sin(deltaLng/2) * Math.sin(deltaLng/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const distance = R * c; // Distance in miles
+
+        // Convert to driving time (assuming average speed of 45 mph including stops)
+        const drivingTimeHours = distance / 45;
+        const drivingTimeMinutes = Math.round(drivingTimeHours * 60);
+        
+        return {
+            distance: Math.round(distance * 10) / 10, // Round to 1 decimal
+            drivingTime: drivingTimeMinutes,
+            isLongDistance: drivingTimeMinutes > 45 // Warning if over 45 minutes
+        };
+    }
+
     generateDayActivities(dayWineries) {
         const activities = [];
         
@@ -454,6 +479,24 @@ class WineTripPlanner {
                         </div>
                     </div>
                 `;
+                
+                // Add driving time to next winery if not the last one
+                if (index < day.wineries.length - 1) {
+                    const nextWinery = day.wineries[index + 1];
+                    const drivingInfo = this.calculateDrivingTimeBetween(winery, nextWinery);
+                    const warningClass = drivingInfo.isLongDistance ? ' warning' : '';
+                    const warningIcon = drivingInfo.isLongDistance ? '⚠️' : '🚗';
+                    const warningText = drivingInfo.isLongDistance ? 
+                        ` - Consider replacing one winery with a closer option` : '';
+                    
+                    html += `
+                        <div class="driving-info${warningClass}">
+                            <span class="icon">${warningIcon}</span>
+                            <strong>Drive to next winery:</strong> ${drivingInfo.drivingTime} minutes 
+                            (${drivingInfo.distance} miles)${warningText}
+                        </div>
+                    `;
+                }
             });
             
             // Add activities for the day
