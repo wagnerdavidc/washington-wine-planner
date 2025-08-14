@@ -5,10 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Washington Wine Country - Your Personal Wine Journey</title>
     <meta name="description" content="Plan the perfect wine trip through Washington State with personalized recommendations, interactive maps, and concierge-level service.">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍷</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%238B0000'/><circle cx='50' cy='45' r='25' fill='none' stroke='%23D4AF37' stroke-width='3'/><path d='M35 45 Q50 25 65 45' fill='none' stroke='%23D4AF37' stroke-width='2'/></svg>">
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Cormorant+Garamond:wght@300;400;500&display=swap" rel="stylesheet">
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="styles.css">
@@ -23,8 +28,11 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🍷 Washington Wine Country</h1>
+            <h1>Washington Wine Country</h1>
             <p>Your personalized concierge to the perfect wine adventure</p>
+            <div class="header-admin">
+                <button class="admin-link" onclick="showSection('admin')" title="Admin Access">⚙️</button>
+            </div>
         </div>
 
         <!-- Welcome Section -->
@@ -34,15 +42,15 @@
             
             <div class="feature-highlights">
                 <div class="feature">
-                    <h3>🎯 Personalized Recommendations</h3>
+                    <h3>Personalized Recommendations</h3>
                     <p>Get winery suggestions based on your taste preferences and experience level</p>
                 </div>
                 <div class="feature">
-                    <h3>🗺️ Interactive Maps & Routes</h3>
+                    <h3>Interactive Maps & Routes</h3>
                     <p>Visual trip planning with optimized routes and driving directions</p>
                 </div>
                 <div class="feature">
-                    <h3>📝 Personal Wine Journal</h3>
+                    <h3>Personal Wine Journal</h3>
                     <p>Save favorites and capture your tasting notes for future reference</p>
                 </div>
             </div>
@@ -90,11 +98,11 @@
                 <div id="profilePreferences"></div>
             </div>
             <div class="profile-section">
-                <h3>Favorite Wineries ❤️</h3>
+                <h3>Favorite Wineries</h3>
                 <div id="favoriteWineries"></div>
             </div>
             <div class="profile-section">
-                <h3>My Tasting Notes 📝</h3>
+                <h3>My Tasting Notes</h3>
                 <div id="tastingNotes"></div>
             </div>
             <div class="profile-stats">
@@ -105,6 +113,65 @@
                 <button class="btn btn-secondary" onclick="showSection('results')">Back to Itinerary</button>
                 <button class="btn btn-primary" onclick="exportProfile()">Export Profile</button>
                 <button class="btn btn-secondary" onclick="clearProfile()">Reset Profile</button>
+            </div>
+        </div>
+
+        <!-- Admin Section -->
+        <div id="admin" class="section">
+            <div id="adminLogin" class="admin-login">
+                <h2>Admin Access</h2>
+                <div class="login-form">
+                    <div class="form-group">
+                        <label for="adminUsername">Username:</label>
+                        <input type="text" id="adminUsername" placeholder="Enter username">
+                    </div>
+                    <div class="form-group">
+                        <label for="adminPassword">Password:</label>
+                        <input type="password" id="adminPassword" placeholder="Enter password">
+                    </div>
+                    <div class="nav-buttons">
+                        <button class="btn btn-primary" onclick="adminLogin()">Login</button>
+                        <button class="btn btn-secondary" onclick="showSection('welcome')">Back</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="adminDashboard" class="admin-dashboard" style="display: none;">
+                <h2>Admin Dashboard</h2>
+                <div class="admin-tabs">
+                    <button class="admin-tab active" onclick="showAdminTab('wineries')">Wineries</button>
+                    <button class="admin-tab" onclick="showAdminTab('restaurants')">Restaurants</button>
+                    <button class="admin-tab" onclick="showAdminTab('hotels')">Hotels</button>
+                </div>
+                
+                <div id="adminWineries" class="admin-content active">
+                    <div class="admin-section-header">
+                        <h3>Manage Wineries</h3>
+                        <button class="btn btn-primary" onclick="addNewItem('winery')">Add New Winery</button>
+                    </div>
+                    <div id="wineriesAdmin" class="admin-items-list"></div>
+                </div>
+                
+                <div id="adminRestaurants" class="admin-content">
+                    <div class="admin-section-header">
+                        <h3>Manage Restaurants</h3>
+                        <button class="btn btn-primary" onclick="addNewItem('restaurant')">Add New Restaurant</button>
+                    </div>
+                    <div id="restaurantsAdmin" class="admin-items-list"></div>
+                </div>
+                
+                <div id="adminHotels" class="admin-content">
+                    <div class="admin-section-header">
+                        <h3>Manage Hotels</h3>
+                        <button class="btn btn-primary" onclick="addNewItem('hotel')">Add New Hotel</button>
+                    </div>
+                    <div id="hotelsAdmin" class="admin-items-list"></div>
+                </div>
+                
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" onclick="adminLogout()">Logout</button>
+                    <button class="btn btn-primary" onclick="saveAdminChanges()">Save Changes</button>
+                </div>
             </div>
         </div>
     </div>

@@ -1182,6 +1182,255 @@ class WineTripPlanner {
        
        this.showToast(`Replaced ${oldWinery.name} with ${newWinery.name}! 🔄`);
    }
+
+   // Admin functionality
+   initializeAdmin() {
+       this.adminData = {
+           wineries: window.wineData.wineries.map(w => ({...w, enabled: w.enabled !== false})),
+           restaurants: window.wineData.restaurants.map(r => ({...r, enabled: r.enabled !== false})),
+           accommodations: window.wineData.accommodations.map(a => ({...a, enabled: a.enabled !== false}))
+       };
+   }
+
+   displayAdminItems(type) {
+       const data = this.adminData[type];
+       const container = document.getElementById(`${type}Admin`);
+       
+       let html = '';
+       data.forEach(item => {
+           const isEnabled = item.enabled !== false;
+           html += `
+               <div class="admin-item ${!isEnabled ? 'disabled' : ''}" data-id="${item.id}">
+                   <div class="admin-item-info">
+                       <div class="admin-item-name">${item.name}</div>
+                       <div class="admin-item-details">
+                           ${type === 'wineries' ? 
+                               `${item.region} • ${item.specialty} • $${item.tastingFee}` :
+                           type === 'restaurants' ? 
+                               `${item.location} • ${item.cuisine} • ${item.priceLevel}` :
+                               `${item.location} • ${item.type} • ${item.priceLevel}`
+                           }
+                       </div>
+                   </div>
+                   <label class="admin-toggle">
+                       <input type="checkbox" ${isEnabled ? 'checked' : ''} 
+                              onchange="app.toggleItemEnabled('${type}', ${item.id}, this.checked)">
+                       <span class="admin-slider"></span>
+                   </label>
+                   <button class="admin-btn-small admin-btn-edit" 
+                           onclick="app.editItem('${type}', ${item.id})">
+                       Edit
+                   </button>
+                   <button class="admin-btn-small admin-btn-delete" 
+                           onclick="app.deleteItem('${type}', ${item.id})">
+                       Delete
+                   </button>
+               </div>
+           `;
+       });
+       
+       container.innerHTML = html;
+   }
+
+   toggleItemEnabled(type, id, enabled) {
+       const item = this.adminData[type].find(item => item.id === id);
+       if (item) {
+           item.enabled = enabled;
+           this.showToast(`${item.name} ${enabled ? 'enabled' : 'disabled'}`, enabled ? 'success' : 'warning');
+       }
+   }
+
+   editItem(type, id) {
+       const item = this.adminData[type].find(item => item.id === id);
+       if (!item) return;
+
+       const modal = document.createElement('div');
+       modal.className = 'admin-edit-modal';
+       
+       const fields = this.getEditFields(type, item);
+       
+       modal.innerHTML = `
+           <div class="admin-edit-content">
+               <div class="admin-edit-header">
+                   <h3>Edit ${type.slice(0, -1).charAt(0).toUpperCase() + type.slice(1, -1)}</h3>
+                   <button class="close-btn" onclick="this.closest('.admin-edit-modal').remove()">×</button>
+               </div>
+               <div class="admin-edit-body">
+                   <form id="adminEditForm" class="admin-form-grid">
+                       ${fields}
+                   </form>
+                   <div class="admin-form-actions">
+                       <button class="btn btn-secondary" onclick="this.closest('.admin-edit-modal').remove()">Cancel</button>
+                       <button class="btn btn-primary" onclick="app.saveItemEdit('${type}', ${id})">Save Changes</button>
+                   </div>
+               </div>
+           </div>
+       `;
+
+       document.body.appendChild(modal);
+   }
+
+   getEditFields(type, item) {
+       if (type === 'wineries') {
+           return `
+               <div class="form-group">
+                   <label>Name:</label>
+                   <input type="text" name="name" value="${item.name}" required>
+               </div>
+               <div class="admin-form-row">
+                   <div class="form-group">
+                       <label>Region:</label>
+                       <input type="text" name="region" value="${item.region}" required>
+                   </div>
+                   <div class="form-group">
+                       <label>Price Level:</label>
+                       <select name="priceLevel" required>
+                           <option value="budget" ${item.priceLevel === 'budget' ? 'selected' : ''}>Budget</option>
+                           <option value="moderate" ${item.priceLevel === 'moderate' ? 'selected' : ''}>Moderate</option>
+                           <option value="premium" ${item.priceLevel === 'premium' ? 'selected' : ''}>Premium</option>
+                           <option value="luxury" ${item.priceLevel === 'luxury' ? 'selected' : ''}>Luxury</option>
+                       </select>
+                   </div>
+               </div>
+               <div class="form-group">
+                   <label>Specialty:</label>
+                   <input type="text" name="specialty" value="${item.specialty}" required>
+               </div>
+               <div class="admin-form-row">
+                   <div class="form-group">
+                       <label>Tasting Fee:</label>
+                       <input type="number" name="tastingFee" value="${item.tastingFee}" required>
+                   </div>
+                   <div class="form-group">
+                       <label>Rating:</label>
+                       <input type="number" step="0.1" min="1" max="5" name="rating" value="${item.rating}" required>
+                   </div>
+               </div>
+               <div class="form-group">
+                   <label>Hours:</label>
+                   <input type="text" name="hours" value="${item.hours}" required>
+               </div>
+               <div class="form-group">
+                   <label>Phone:</label>
+                   <input type="text" name="phone" value="${item.phone}" required>
+               </div>
+               <div class="form-group">
+                   <label>Website:</label>
+                   <input type="url" name="website" value="${item.website}" required>
+               </div>
+               <div class="form-group">
+                   <label>Description:</label>
+                   <textarea name="description" rows="3" required>${item.description}</textarea>
+               </div>
+           `;
+       } else if (type === 'restaurants') {
+           return `
+               <div class="form-group">
+                   <label>Name:</label>
+                   <input type="text" name="name" value="${item.name}" required>
+               </div>
+               <div class="admin-form-row">
+                   <div class="form-group">
+                       <label>Location:</label>
+                       <input type="text" name="location" value="${item.location}" required>
+                   </div>
+                   <div class="form-group">
+                       <label>Cuisine:</label>
+                       <input type="text" name="cuisine" value="${item.cuisine}" required>
+                   </div>
+               </div>
+               <div class="admin-form-row">
+                   <div class="form-group">
+                       <label>Price Level:</label>
+                       <select name="priceLevel" required>
+                           <option value="budget" ${item.priceLevel === 'budget' ? 'selected' : ''}>Budget</option>
+                           <option value="moderate" ${item.priceLevel === 'moderate' ? 'selected' : ''}>Moderate</option>
+                           <option value="luxury" ${item.priceLevel === 'luxury' ? 'selected' : ''}>Luxury</option>
+                       </select>
+                   </div>
+                   <div class="form-group">
+                       <label>Rating:</label>
+                       <input type="number" step="0.1" min="1" max="5" name="rating" value="${item.rating}" required>
+                   </div>
+               </div>
+               <div class="form-group">
+                   <label>Phone:</label>
+                   <input type="text" name="phone" value="${item.phone}" required>
+               </div>
+               <div class="form-group">
+                   <label>Description:</label>
+                   <textarea name="description" rows="3" required>${item.description}</textarea>
+               </div>
+           `;
+       } else { // accommodations
+           return `
+               <div class="form-group">
+                   <label>Name:</label>
+                   <input type="text" name="name" value="${item.name}" required>
+               </div>
+               <div class="admin-form-row">
+                   <div class="form-group">
+                       <label>Location:</label>
+                       <input type="text" name="location" value="${item.location}" required>
+                   </div>
+                   <div class="form-group">
+                       <label>Type:</label>
+                       <input type="text" name="type" value="${item.type}" required>
+                   </div>
+               </div>
+               <div class="admin-form-row">
+                   <div class="form-group">
+                       <label>Price Level:</label>
+                       <select name="priceLevel" required>
+                           <option value="budget" ${item.priceLevel === 'budget' ? 'selected' : ''}>Budget</option>
+                           <option value="moderate" ${item.priceLevel === 'moderate' ? 'selected' : ''}>Moderate</option>
+                           <option value="boutique" ${item.priceLevel === 'boutique' ? 'selected' : ''}>Boutique</option>
+                           <option value="luxury" ${item.priceLevel === 'luxury' ? 'selected' : ''}>Luxury</option>
+                       </select>
+                   </div>
+                   <div class="form-group">
+                       <label>Rating:</label>
+                       <input type="number" step="0.1" min="1" max="5" name="rating" value="${item.rating}" required>
+                   </div>
+               </div>
+               <div class="form-group">
+                   <label>Description:</label>
+                   <textarea name="description" rows="3" required>${item.description}</textarea>
+               </div>
+           `;
+       }
+   }
+
+   saveItemEdit(type, id) {
+       const form = document.getElementById('adminEditForm');
+       const formData = new FormData(form);
+       const item = this.adminData[type].find(item => item.id === id);
+       
+       if (item) {
+           // Update item with form data
+           for (let [key, value] of formData.entries()) {
+               if (key === 'tastingFee' || key === 'rating') {
+                   item[key] = parseFloat(value);
+               } else {
+                   item[key] = value;
+               }
+           }
+           
+           document.querySelector('.admin-edit-modal').remove();
+           this.displayAdminItems(type);
+           this.showToast(`${item.name} updated successfully!`);
+       }
+   }
+
+   deleteItem(type, id) {
+       const item = this.adminData[type].find(item => item.id === id);
+       if (item && confirm(`Are you sure you want to delete ${item.name}?`)) {
+           const index = this.adminData[type].findIndex(item => item.id === id);
+           this.adminData[type].splice(index, 1);
+           this.displayAdminItems(type);
+           this.showToast(`${item.name} deleted successfully!`, 'warning');
+       }
+   }
 }
 
 // Initialize the application
@@ -1195,3 +1444,60 @@ function showSection(sectionId) { app.showSection(sectionId); }
 function exportProfile() { app.exportProfile(); }
 function exportItinerary() { app.exportItinerary(); }
 function clearProfile() { app.clearProfile(); }
+
+// Admin functions
+function adminLogin() {
+    const username = document.getElementById('adminUsername').value;
+    const password = document.getElementById('adminPassword').value;
+    
+    if (username === 'admin' && password === 'admin') {
+        document.getElementById('adminLogin').style.display = 'none';
+        document.getElementById('adminDashboard').style.display = 'block';
+        
+        // Initialize admin data and display
+        app.initializeAdmin();
+        app.displayAdminItems('wineries');
+        
+        app.showToast('Admin login successful!');
+    } else {
+        app.showToast('Invalid username or password', 'error');
+    }
+}
+
+function adminLogout() {
+    document.getElementById('adminLogin').style.display = 'block';
+    document.getElementById('adminDashboard').style.display = 'none';
+    document.getElementById('adminUsername').value = '';
+    document.getElementById('adminPassword').value = '';
+    app.showToast('Logged out successfully', 'warning');
+}
+
+function showAdminTab(tabName) {
+    // Update tab active states
+    document.querySelectorAll('.admin-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // Update content active states
+    document.querySelectorAll('.admin-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    document.getElementById(`admin${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`).classList.add('active');
+    
+    // Display items for the selected tab
+    const typeMap = {
+        'wineries': 'wineries',
+        'restaurants': 'restaurants', 
+        'hotels': 'accommodations'
+    };
+    app.displayAdminItems(typeMap[tabName]);
+}
+
+function addNewItem(type) {
+    app.showToast('Add new item functionality would be implemented here', 'info');
+}
+
+function saveAdminChanges() {
+    app.showToast('Changes saved successfully! (In production, this would sync with the database)', 'success');
+}
