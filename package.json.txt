@@ -1,0 +1,40 @@
+{
+  "name": "washington-wine-planner",
+  "version": "1.0.0",
+  "description": "A personalized wine journey planner for Washington State",
+  "main": "index.html",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo 'No build step required for static site'",
+    "serve": "npx serve .",
+    "lint": "echo 'Add linting configuration as needed'",
+    "test": "echo 'Add testing framework as needed'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wagnerdavidc/washington-wine-planner.git"
+  },
+  "keywords": [
+    "wine",
+    "washington-state",
+    "travel",
+    "planner",
+    "winery",
+    "trip-planner",
+    "wine-tasting",
+    "javascript"
+  ],
+  "author": "David Wagner <wagner.davidc@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/wagnerdavidc/washington-wine-planner/issues"
+  },
+  "homepage": "https://github.com/wagnerdavidc/washington-wine-planner#readme",
+  "devDependencies": {
+    "netlify-cli": "^17.0.0",
+    "serve": "^14.2.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
