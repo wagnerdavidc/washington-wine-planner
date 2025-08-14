@@ -424,7 +424,7 @@ body {
 }
 
 .favorite-btn::before {
-    content: "♡";
+    content: "🤍";
 }
 
 .favorite-btn:hover {
@@ -433,13 +433,12 @@ body {
 }
 
 .favorite-btn.favorited {
-    color: #ff6b6b;
     transform: scale(1.1);
     animation: heartbeat 0.6s ease-in-out;
 }
 
 .favorite-btn.favorited::before {
-    content: "♥";
+    content: "❤️";
 }
 
 @keyframes heartbeat {
