@@ -780,6 +780,12 @@ body {
     margin: 20px 0;
 }
 
+/* Itinerary specific recommendations (wineries) should stack vertically */
+.route-info .recommendations {
+    display: block;
+    gap: 0;
+}
+
 .recommendation-card {
     background: white;
     border-radius: var(--border-radius);
